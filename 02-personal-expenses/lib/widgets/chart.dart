@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:personal_expenses/models/transaction.dart';
 import 'package:intl/intl.dart';
+import 'package:personal_expenses/models/transaction.dart';
 import 'package:personal_expenses/widgets/chart_bar.dart';
 
 class Chart extends StatelessWidget {
@@ -12,7 +12,7 @@ class Chart extends StatelessWidget {
     final now = DateTime.now();
     return List.generate(7, (index) {
       final weekDay = now.subtract(
-        Duration(days: index),
+        Duration(days: 6 - index),
       );
       final totalSum = recentTransactions.where((tx) {
         return tx.date.day == weekDay.day &&
@@ -36,7 +36,7 @@ class Chart extends StatelessWidget {
         padding: EdgeInsets.all(10),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: _groupedTransactionValues.reversed.map((gtx) {
+          children: _groupedTransactionValues.map((gtx) {
             return Flexible(
               fit: FlexFit.tight,
               child: ChartBar(
