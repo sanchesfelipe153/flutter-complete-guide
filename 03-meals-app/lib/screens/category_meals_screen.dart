@@ -1,24 +1,43 @@
 import 'package:flutter/material.dart';
 
-import '../dummy_data.dart';
+import '../models/meal.dart';
 import '../widgets/meal_item.dart';
 
-class CategoryMealsScreen extends StatelessWidget {
+class CategoryMealsScreen extends StatefulWidget {
+  static const routeName = '/category-meals';
+
   final String categoryID;
   final String categoryTitle;
+  final List<Meal> availableMeals;
 
-  const CategoryMealsScreen(this.categoryID, this.categoryTitle);
+  const CategoryMealsScreen({
+    required this.categoryID,
+    required this.categoryTitle,
+    required this.availableMeals,
+  });
+
+  @override
+  _CategoryMealsScreenState createState() => _CategoryMealsScreenState();
+}
+
+class _CategoryMealsScreenState extends State<CategoryMealsScreen> {
+  final List<Meal> displayedMeals = [];
+
+  @override
+  void initState() {
+    super.initState();
+    displayedMeals.addAll(widget.availableMeals.where((meal) => meal.categories.contains(widget.categoryID)));
+  }
 
   @override
   Widget build(BuildContext context) {
-    final categoryMeals = DUMMY_MEALS.where((meal) => meal.categories.contains(categoryID)).toList();
     return Scaffold(
       appBar: AppBar(
-        title: Text(categoryTitle),
+        title: Text(widget.categoryTitle),
       ),
       body: ListView.builder(
         itemBuilder: (_, index) {
-          final meal = categoryMeals[index];
+          final meal = displayedMeals[index];
           return MealItem(
             id: meal.id,
             title: meal.title,
@@ -28,8 +47,15 @@ class CategoryMealsScreen extends StatelessWidget {
             affordability: meal.affordability,
           );
         },
-        itemCount: categoryMeals.length,
+        itemCount: displayedMeals.length,
       ),
     );
   }
+}
+
+class CategoryMealsScreenData {
+  final String categoryID;
+  final String categoryTitle;
+
+  const CategoryMealsScreenData(this.categoryID, this.categoryTitle);
 }
