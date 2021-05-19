@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'screens/cart_screen.dart';
+import 'screens/orders_screen.dart';
 import 'screens/product_detail_screen.dart';
 import 'screens/products_overview_screen.dart';
 
@@ -7,12 +9,16 @@ class Routes {
   Routes._();
 
   static const home = NamedRouteInfo(_home);
+  static const cart = NamedRouteInfo(_cart);
+  static const orders = NamedRouteInfo(_orders);
 
   static NamedRouteInfo productDetail(String id) {
     return NamedRouteInfo(_productDetail, data: id);
   }
 
   static const _home = '/';
+  static const _cart = '/cart';
+  static const _orders = '/orders';
   static const _productDetail = '/product-detail';
 
   static final RouteFactory generator = (settings) {
@@ -20,6 +26,12 @@ class Routes {
     switch (settings.name) {
       case _home:
         builder = (_) => ProductsOverviewScreen();
+        break;
+      case _cart:
+        builder = (_) => CartScreen();
+        break;
+      case _orders:
+        builder = (_) => OrdersScreen();
         break;
       case _productDetail:
         builder = (_) {

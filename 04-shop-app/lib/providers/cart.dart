@@ -8,10 +8,15 @@ class Cart with ChangeNotifier {
 
   Map<String, CartItem> get items => {..._items};
 
-  void addItem(String productId, double price, String title) {
-    if (_items.containsKey(productId)) {
+  int get itemCount => _items.length;
+
+  double get totalAmount =>
+      _items.values.map((item) => item.quantity * item.price).fold(0.0, (previous, next) => previous + next);
+
+  void addItem(String productID, double price, String title) {
+    if (_items.containsKey(productID)) {
       _items.update(
-        productId,
+        productID,
         (oldItem) => CartItem(
           id: oldItem.id,
           title: oldItem.title,
@@ -21,7 +26,7 @@ class Cart with ChangeNotifier {
       );
     } else {
       _items.putIfAbsent(
-        productId,
+        productID,
         () => CartItem(
           id: _uuid.v4(),
           title: title,
@@ -30,6 +35,16 @@ class Cart with ChangeNotifier {
         ),
       );
     }
+    notifyListeners();
+  }
+
+  void removeItem(String productID) {
+    _items.remove(productID);
+    notifyListeners();
+  }
+
+  void clear() {
+    _items = {};
     notifyListeners();
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'providers/cart.dart';
+import 'providers/orders.dart';
 import 'providers/products.dart';
 import 'routes.dart';
 
@@ -18,6 +19,9 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (_) => Cart(),
         ),
+        ChangeNotifierProvider(
+          create: (_) => Orders(),
+        ),
       ],
       child: MaterialApp(
         title: 'MyShop',
@@ -27,6 +31,7 @@ class MyApp extends StatelessWidget {
           fontFamily: 'Lato',
         ),
         onGenerateRoute: Routes.generator,
+        debugShowCheckedModeBanner: false,
       ),
     );
   }
