@@ -1,8 +1,11 @@
 import 'package:flutter/foundation.dart';
+import 'package:uuid/uuid.dart';
 
 import 'product.dart';
 
 class Products with ChangeNotifier {
+  final _uuid = Uuid();
+
   List<Product> _items = [
     Product(
       id: 'p1',
@@ -41,8 +44,20 @@ class Products with ChangeNotifier {
 
   Product findByID(String id) => _items.firstWhere((item) => item.id == id);
 
-  void addProduct() {
-    // TODO
+  void addProduct(Product product) {
+    final newProduct = product.copy(id: _uuid.v4());
+    _items.add(newProduct);
+    notifyListeners();
+  }
+
+  void updateProduct(Product product) {
+    final index = _items.indexWhere((item) => item.id == product.id);
+    _items[index] = product;
+    notifyListeners();
+  }
+
+  void deleteProduct(String id) {
+    _items.removeWhere((item) => item.id == id);
     notifyListeners();
   }
 }
