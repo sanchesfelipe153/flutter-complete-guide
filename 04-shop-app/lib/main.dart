@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart' as DotEnv;
 import 'package:provider/provider.dart';
 
 import 'providers/cart.dart';
@@ -6,7 +7,10 @@ import 'providers/orders.dart';
 import 'providers/products.dart';
 import 'routes.dart';
 
-void main() => runApp(MyApp());
+Future main() async {
+  await DotEnv.load(fileName: 'assets/env/.env_firebase');
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   @override

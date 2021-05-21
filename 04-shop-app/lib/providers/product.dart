@@ -1,4 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
+
+import '../firebase.dart';
+import '../models/http_exception.dart';
 
 class Product with ChangeNotifier {
   final String id;
@@ -34,8 +40,22 @@ class Product with ChangeNotifier {
         isFavorite: isFavorite ?? this.isFavorite,
       );
 
-  void toggleFavoriteStatus() {
+  Future<void> toggleFavoriteStatus() async {
     isFavorite = !isFavorite;
     notifyListeners();
+    try {
+      final response = await http.patch(
+        Firebase.products(id),
+        body: json.encode({
+          'isFavorite': isFavorite,
+        }),
+      );
+      if (response.statusCode >= 400) {
+        throw HttpException('Error while updating the product');
+      }
+    } catch (_) {
+      isFavorite = !isFavorite;
+      notifyListeners();
+    }
   }
 }

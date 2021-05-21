@@ -22,19 +22,22 @@ class UserProductsScreen extends StatelessWidget {
         ],
       ),
       drawer: AppDrawer(),
-      body: Padding(
-        padding: const EdgeInsets.all(8),
-        child: ListView.builder(
-          itemCount: productsData.items.length,
-          itemBuilder: (_, index) {
-            final product = productsData.items[index];
-            return Column(
-              children: [
-                UserProductItem(id: product.id, title: product.title, imageUrl: product.imageUrl),
-                Divider(),
-              ],
-            );
-          },
+      body: RefreshIndicator(
+        onRefresh: () => productsData.fetchAndSet(),
+        child: Padding(
+          padding: const EdgeInsets.all(8),
+          child: ListView.builder(
+            itemCount: productsData.items.length,
+            itemBuilder: (_, index) {
+              final product = productsData.items[index];
+              return Column(
+                children: [
+                  UserProductItem(id: product.id, title: product.title, imageUrl: product.imageUrl),
+                  Divider(),
+                ],
+              );
+            },
+          ),
         ),
       ),
     );

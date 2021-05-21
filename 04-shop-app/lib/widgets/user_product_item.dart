@@ -15,6 +15,19 @@ class UserProductItem extends StatelessWidget {
     required this.imageUrl,
   });
 
+  Future<void> _removeProduct(BuildContext context, ScaffoldMessengerState scaffold) async {
+    try {
+      await Provider.of<Products>(context, listen: false).deleteProduct(id);
+    } catch (error) {
+      scaffold.showSnackBar(SnackBar(
+        content: Text(
+          '$error',
+          textAlign: TextAlign.center,
+        ),
+      ));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListTile(
@@ -33,7 +46,7 @@ class UserProductItem extends StatelessWidget {
             ),
             IconButton(
               icon: const Icon(Icons.delete),
-              onPressed: () => Provider.of<Products>(context, listen: false).deleteProduct(id),
+              onPressed: () => _removeProduct(context, ScaffoldMessenger.of(context)),
               color: Theme.of(context).errorColor,
             ),
           ],
