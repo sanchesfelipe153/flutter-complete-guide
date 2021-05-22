@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'screens/auth_screen.dart';
 import 'screens/cart_screen.dart';
 import 'screens/edit_product_screen.dart';
 import 'screens/orders_screen.dart';
@@ -10,74 +11,48 @@ import 'screens/user_products_screen.dart';
 class Routes {
   Routes._();
 
-  static const home = NamedRouteInfo(_home);
-  static const cart = NamedRouteInfo(_cart);
-  static const orders = NamedRouteInfo(_orders);
-  static const userProducts = NamedRouteInfo(_userProducts);
+  static final auth = NamedRouteInfo._('/auth', (_) => AuthScreen());
+  static final cart = NamedRouteInfo._('/cart', (_) => CartScreen());
+  static final orders = NamedRouteInfo._('/orders', (_) => OrdersScreen());
+  static final productsOverview = NamedRouteInfo._('/products-overview', (_) => ProductsOverviewScreen());
+  static final userProducts = NamedRouteInfo._('/user-products', (_) => UserProductsScreen());
 
   static NamedRouteInfo productDetail(String id) {
-    return NamedRouteInfo(_productDetail, data: id);
+    return NamedRouteInfo._('/product-detail', (_) => ProductDetailScreen(id));
   }
 
   static NamedRouteInfo editProduct([String? id]) {
-    return NamedRouteInfo(_editProduct, data: id);
+    return NamedRouteInfo._('/edit-product', (_) => EditProductScreen(id));
   }
 
-  static const _home = '/';
-  static const _cart = '/cart';
-  static const _orders = '/orders';
-  static const _productDetail = '/product-detail';
-  static const _userProducts = '/user-products';
-  static const _editProduct = '/edit-product';
-
   static final RouteFactory generator = (settings) {
-    final WidgetBuilder builder;
-    switch (settings.name) {
-      case _home:
-        builder = (_) => ProductsOverviewScreen();
-        break;
-      case _cart:
-        builder = (_) => CartScreen();
-        break;
-      case _orders:
-        builder = (_) => OrdersScreen();
-        break;
-      case _userProducts:
-        builder = (_) => UserProductsScreen();
-        break;
-      case _productDetail:
-        builder = (_) {
-          final id = settings.arguments as String;
-          return ProductDetailScreen(id);
-        };
-        break;
-      case _editProduct:
-        builder = (_) {
-          final id = settings.arguments as String?;
-          return EditProductScreen(id);
-        };
-        break;
-      default:
-        throw Exception('Must implement ${settings.name} route');
+    if (settings.arguments is NamedRouteInfo) {
+      return MaterialPageRoute(builder: (settings.arguments as NamedRouteInfo)._builder);
     }
-
-    return MaterialPageRoute(builder: builder);
+    return null;
   };
 }
 
 extension RoutesExtension on NavigatorState {
   Future<T?> pushNamedInfo<T extends Object?>(NamedRouteInfo route) {
-    return this.pushNamed(route.name, arguments: route.data);
+    return this.pushNamed(route.name, arguments: route);
   }
 
   Future<T?> pushReplacementNamedInfo<T extends Object?>(NamedRouteInfo route) {
-    return this.pushReplacementNamed(route.name, arguments: route.data);
+    return this.pushReplacementNamed(route.name, arguments: route);
   }
 }
 
 class NamedRouteInfo {
   final String name;
-  final Object? data;
+  final WidgetBuilder _builder;
 
-  const NamedRouteInfo(this.name, {this.data});
+  NamedRouteInfo._(this.name, this._builder);
+
+  Widget build(BuildContext context) => _builder(context);
+
+  @override
+  String toString() => name;
 }
+
+typedef WidgetBuilderProvider = WidgetBuilder Function();

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../providers/auth.dart';
 import '../routes.dart';
 
 class AppDrawer extends StatelessWidget {
@@ -18,7 +20,7 @@ class AppDrawer extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.shop),
             title: const Text('Shop'),
-            onTap: () => Navigator.of(context).pushReplacementNamedInfo(Routes.home),
+            onTap: () => Navigator.of(context).pushReplacementNamedInfo(Routes.productsOverview),
           ),
           Divider(),
           ListTile(
@@ -31,6 +33,15 @@ class AppDrawer extends StatelessWidget {
             leading: const Icon(Icons.edit),
             title: const Text('Manage Products'),
             onTap: () => Navigator.of(context).pushReplacementNamedInfo(Routes.userProducts),
+          ),
+          Divider(),
+          ListTile(
+            leading: const Icon(Icons.exit_to_app),
+            title: const Text('Logout'),
+            onTap: () {
+              Navigator.of(context).pushReplacementNamed('/');
+              Provider.of<Auth>(context, listen: false).logout();
+            },
           ),
         ],
       ),

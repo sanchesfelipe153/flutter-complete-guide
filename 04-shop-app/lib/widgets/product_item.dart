@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../providers/auth.dart';
 import '../providers/cart.dart';
 import '../providers/product.dart';
 import '../routes.dart';
@@ -8,6 +9,7 @@ import '../routes.dart';
 class ProductItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final auth = Provider.of<Auth>(context, listen: false);
     final product = Provider.of<Product>(context, listen: false);
     final cart = Provider.of<Cart>(context, listen: false);
 
@@ -26,7 +28,7 @@ class ProductItem extends StatelessWidget {
           leading: Consumer<Product>(
             builder: (_, product, __) => IconButton(
               icon: Icon(product.isFavorite ? Icons.favorite : Icons.favorite_border),
-              onPressed: product.toggleFavoriteStatus,
+              onPressed: () => product.toggleFavoriteStatus(auth.token!, auth.userID!),
               color: Theme.of(context).accentColor,
             ),
           ),

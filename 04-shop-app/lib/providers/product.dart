@@ -40,15 +40,13 @@ class Product with ChangeNotifier {
         isFavorite: isFavorite ?? this.isFavorite,
       );
 
-  Future<void> toggleFavoriteStatus() async {
+  Future<void> toggleFavoriteStatus(String authToken, String userID) async {
     isFavorite = !isFavorite;
     notifyListeners();
     try {
-      final response = await http.patch(
-        Firebase.products(id),
-        body: json.encode({
-          'isFavorite': isFavorite,
-        }),
+      final response = await http.put(
+        Firebase.userFavorites(authToken, userID, id),
+        body: json.encode(isFavorite),
       );
       if (response.statusCode >= 400) {
         throw HttpException('Error while updating the product');

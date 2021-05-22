@@ -9,12 +9,17 @@ import 'cart.dart';
 class Orders with ChangeNotifier {
   List<OrderItem> _orders = [];
 
+  final String _authToken;
+  final String _userID;
+
+  Orders(this._authToken, this._userID, this._orders);
+
   List<OrderItem> get orders => [..._orders];
 
   Future<void> addOrder(List<CartItem> cartProducts, double total) async {
     final now = DateTime.now();
     final response = await http.post(
-      Firebase.orders(),
+      Firebase.orders(_authToken, _userID),
       body: json.encode({
         'amount': total,
         'products': cartProducts
@@ -43,7 +48,7 @@ class Orders with ChangeNotifier {
   }
 
   Future<void> fetchAndSet() async {
-    final response = await http.get(Firebase.orders());
+    final response = await http.get(Firebase.orders(_authToken, _userID));
     final extractedData = json.decode(response.body) as Map<String, dynamic>?;
     final List<OrderItem> loadedOrders = [];
     extractedData?.forEach((id, orderData) {
