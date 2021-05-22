@@ -56,3 +56,4 @@ flutter:
 
   assets:
     - assets/env/
+    - assets/images/product-placeholder.png

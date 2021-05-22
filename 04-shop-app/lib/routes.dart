@@ -27,7 +27,7 @@ class Routes {
 
   static final RouteFactory generator = (settings) {
     if (settings.arguments is NamedRouteInfo) {
-      return MaterialPageRoute(builder: (settings.arguments as NamedRouteInfo)._builder);
+      return _CustomRoute(builder: (settings.arguments as NamedRouteInfo)._builder);
     }
     return null;
   };
@@ -55,4 +55,22 @@ class NamedRouteInfo {
   String toString() => name;
 }
 
-typedef WidgetBuilderProvider = WidgetBuilder Function();
+class _CustomRoute<T> extends MaterialPageRoute<T> {
+  _CustomRoute({
+    required WidgetBuilder builder,
+    RouteSettings? settings,
+  }) : super(builder: builder, settings: settings);
+
+  @override
+  Widget buildTransitions(
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) {
+    if (settings.name == '/') {
+      return child;
+    }
+    return FadeTransition(opacity: animation, child: child);
+  }
+}
