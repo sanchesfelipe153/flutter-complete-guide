@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
-import '../providers/products.dart';
+import '../redux/redux.dart';
 import '../routes.dart';
 
 class UserProductItem extends StatelessWidget {
@@ -17,7 +16,7 @@ class UserProductItem extends StatelessWidget {
 
   Future<void> _removeProduct(BuildContext context, ScaffoldMessengerState scaffold) async {
     try {
-      await Provider.of<Products>(context, listen: false).deleteProduct(id);
+      await StoreProvider.of<AppState>(context, listen: false).dispatch(DeleteProduct(id));
     } catch (error) {
       scaffold.showSnackBar(SnackBar(
         content: Text(

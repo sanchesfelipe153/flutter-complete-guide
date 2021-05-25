@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
-import '../providers/product.dart';
-import '../providers/products.dart';
+import '../models/models.dart';
+import '../redux/redux.dart';
 
 class EditProductScreen extends StatefulWidget {
   final String? id;
@@ -28,15 +27,10 @@ class _EditProductScreenState extends State<EditProductScreen> {
   void initState() {
     super.initState();
     _imageUrlFocusNode.addListener(_updateImageUrl);
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
 
     final productID = widget.id;
     if (productID != null) {
-      _editedProduct = Provider.of<Products>(context, listen: false).findByID(productID);
+      _editedProduct = StoreProvider.of<AppState>(context, listen: false).state.findProductByID(productID);
       _imageUrlController.text = _editedProduct.imageUrl;
     }
   }
@@ -67,12 +61,12 @@ class _EditProductScreenState extends State<EditProductScreen> {
     }
     _form.currentState!.save();
     setState(() => _isLoading = true);
-    var productsData = Provider.of<Products>(context, listen: false);
+    final store = StoreProvider.of<AppState>(context, listen: false);
     try {
       if (_editedProduct.id.isEmpty) {
-        await productsData.addProduct(_editedProduct);
+        await store.dispatch(AddNewProduct(_editedProduct));
       } else {
-        await productsData.updateProduct(_editedProduct);
+        await store.dispatch(UpdateProduct(_editedProduct));
       }
     } catch (_) {
       await showDialog<Null>(

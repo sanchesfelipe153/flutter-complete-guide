@@ -1,73 +1,76 @@
+import 'package:built_collection/built_collection.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
-import '../providers/cart.dart' show Cart;
-import '../providers/orders.dart';
+import '../models/models.dart' as models;
+import '../redux/redux.dart';
 import '../widgets/cart_item.dart';
 
 class CartScreen extends StatelessWidget {
+  const CartScreen();
+
   @override
   Widget build(BuildContext context) {
-    final cart = Provider.of<Cart>(context);
-    final cartItems = cart.items;
-    final products = cartItems.keys.toList(growable: false);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Your Cart'),
       ),
-      body: Column(
-        children: [
-          Card(
-            margin: const EdgeInsets.all(15),
-            child: Padding(
-              padding: const EdgeInsets.all(8),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Total',
-                    style: TextStyle(fontSize: 20),
+      body: StoreConnector<AppState, _ViewModel>(
+        converter: (store) => _ViewModel.fromStore(store),
+        builder: (_, vm) {
+          final products = vm.itemsByProduct.keys.toBuiltList();
+          return Column(
+            children: [
+              Card(
+                margin: const EdgeInsets.all(15),
+                child: Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Total',
+                        style: TextStyle(fontSize: 20),
+                      ),
+                      const Spacer(),
+                      Chip(
+                        label: Text(
+                          '\$${vm.totalAmount.toStringAsFixed(2)}',
+                          style: TextStyle(color: Theme.of(context).primaryTextTheme.headline6?.color),
+                        ),
+                        backgroundColor: Theme.of(context).primaryColor,
+                      ),
+                      const _OrderButton(),
+                    ],
                   ),
-                  Spacer(),
-                  Chip(
-                    label: Text(
-                      '\$${cart.totalAmount.toStringAsFixed(2)}',
-                      style: TextStyle(color: Theme.of(context).primaryTextTheme.headline6?.color),
-                    ),
-                    backgroundColor: Theme.of(context).primaryColor,
-                  ),
-                  _OrderButton(cart),
-                ],
+                ),
               ),
-            ),
-          ),
-          const SizedBox(height: 10),
-          Expanded(
-            child: ListView.builder(
-              itemCount: cart.itemCount,
-              itemBuilder: (_, index) {
-                final product = products[index];
-                final item = cartItems[product]!;
-                return CartItem(
-                  id: item.id,
-                  productID: product,
-                  title: item.title,
-                  quantity: item.quantity,
-                  price: item.price,
-                );
-              },
-            ),
-          ),
-        ],
+              const SizedBox(height: 10),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: products.length,
+                  itemBuilder: (_, index) {
+                    final product = products[index];
+                    final item = vm.itemsByProduct[product]!;
+                    return CartItem(
+                      id: item.id,
+                      productID: product,
+                      title: item.title,
+                      quantity: item.quantity,
+                      price: item.price,
+                    );
+                  },
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
 }
 
 class _OrderButton extends StatefulWidget {
-  final Cart cart;
-
-  _OrderButton(this.cart);
+  const _OrderButton();
 
   @override
   _OrderButtonState createState() => _OrderButtonState();
@@ -78,17 +81,32 @@ class _OrderButtonState extends State<_OrderButton> {
 
   @override
   Widget build(BuildContext context) {
-    return TextButton(
-      child: _isLoading ? const CircularProgressIndicator() : const Text('ORDER NOW'),
-      onPressed: widget.cart.itemCount == 0 || _isLoading
-          ? null
-          : () async {
-              setState(() => _isLoading = true);
-              await Provider.of<Orders>(context, listen: false)
-                  .addOrder(widget.cart.items.values.toList(), widget.cart.totalAmount);
-              widget.cart.clear();
-              setState(() => _isLoading = false);
-            },
+    return StoreConnector<AppState, _ViewModel>(
+      converter: (store) => _ViewModel.fromStore(store),
+      builder: (_, vm) => TextButton(
+        child: _isLoading ? const CircularProgressIndicator() : const Text('ORDER NOW'),
+        onPressed: vm.itemsByProduct.isEmpty || _isLoading
+            ? null
+            : () async {
+                setState(() => _isLoading = true);
+                await vm.createOrder();
+                vm.clearCart();
+                setState(() => _isLoading = false);
+              },
+      ),
     );
   }
+}
+
+class _ViewModel {
+  final double totalAmount;
+  final BuiltMap<String, models.CartItem> itemsByProduct;
+  final Function() clearCart;
+  final Future<void> Function() createOrder;
+
+  _ViewModel.fromStore(Store<AppState> store)
+      : this.totalAmount = store.state.cartSlice.totalAmount,
+        this.itemsByProduct = store.state.cartSlice.itemsByProduct,
+        this.clearCart = (() => store.dispatch(ClearCart())),
+        this.createOrder = (() => store.dispatch(CreateOrder()));
 }

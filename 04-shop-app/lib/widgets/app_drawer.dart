@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
-import '../providers/auth.dart';
+import '../redux/redux.dart';
 import '../routes.dart';
 
 class AppDrawer extends StatelessWidget {
@@ -40,7 +39,7 @@ class AppDrawer extends StatelessWidget {
             title: const Text('Logout'),
             onTap: () {
               Navigator.of(context).pushReplacementNamed('/');
-              Provider.of<Auth>(context, listen: false).logout();
+              StoreProvider.of<AppState>(context, listen: false).dispatch(Logout());
             },
           ),
         ],

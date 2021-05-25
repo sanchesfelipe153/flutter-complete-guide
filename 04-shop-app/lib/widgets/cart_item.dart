@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
-import '../providers/cart.dart';
+import '../redux/redux.dart';
 
 class CartItem extends StatelessWidget {
   final String id;
@@ -24,7 +23,7 @@ class CartItem extends StatelessWidget {
       key: ValueKey(id),
       background: Container(
         color: Theme.of(context).errorColor,
-        child: Icon(
+        child: const Icon(
           Icons.delete,
           color: Colors.white,
           size: 40,
@@ -37,21 +36,21 @@ class CartItem extends StatelessWidget {
       confirmDismiss: (_) => showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
-          title: Text('Are you sure?'),
-          content: Text('Do you want to remove the item from the cart?'),
+          title: const Text('Are you sure?'),
+          content: const Text('Do you want to remove the item from the cart?'),
           actions: [
             TextButton(
-              child: Text('No'),
+              child: const Text('No'),
               onPressed: () => Navigator.of(ctx).pop(false),
             ),
             TextButton(
-              child: Text('Yes'),
+              child: const Text('Yes'),
               onPressed: () => Navigator.of(ctx).pop(true),
             ),
           ],
         ),
       ),
-      onDismissed: (_) => Provider.of<Cart>(context, listen: false).removeItem(productID),
+      onDismissed: (_) => StoreProvider.of<AppState>(context, listen: false).dispatch(RemoveProductFromCart(productID)),
       child: Card(
         margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 4),
         child: Padding(

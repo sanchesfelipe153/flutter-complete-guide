@@ -25,7 +25,7 @@ class CustomFutureBuilder extends StatefulWidget {
 }
 
 class _CustomFutureBuilderState extends State<CustomFutureBuilder> {
-  late Future _future;
+  late final Future _future;
 
   @override
   void initState() {

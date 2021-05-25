@@ -1,14 +1,15 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
-import '../models/http_exception.dart';
-import '../providers/auth.dart';
+import '../models/models.dart';
+import '../redux/redux.dart';
 
 enum AuthMode { Signup, Login }
 
 class AuthScreen extends StatelessWidget {
+  const AuthScreen();
+
   @override
   Widget build(BuildContext context) {
     final deviceSize = MediaQuery.of(context).size;
@@ -99,9 +100,9 @@ class _AuthCardState extends State<_AuthCard> with SingleTickerProviderStateMixi
   var _isLoading = false;
   final _passwordController = TextEditingController();
 
-  late AnimationController _animationController;
-  late Animation<Offset> _slideAnimation;
-  late Animation<double> _opacityAnimation;
+  late final AnimationController _animationController;
+  late final Animation<Offset> _slideAnimation;
+  late final Animation<double> _opacityAnimation;
 
   @override
   void initState() {
@@ -150,20 +151,20 @@ class _AuthCardState extends State<_AuthCard> with SingleTickerProviderStateMixi
     setState(() {
       _isLoading = true;
     });
-    final auth = Provider.of<Auth>(context, listen: false);
+    final store = StoreProvider.of<AppState>(context, listen: false);
     String? errorMessage;
     try {
       if (_authMode == AuthMode.Login) {
-        await auth.login(_authData['email']!.trim(), _authData['password']!.trim());
+        await store.dispatch(Login(_authData['email']!.trim(), _authData['password']!.trim()));
       } else {
-        await auth.signup(_authData['email']!.trim(), _authData['password']!.trim());
+        await store.dispatch(Signup(_authData['email']!.trim(), _authData['password']!.trim()));
       }
     } on HttpException catch (error) {
       errorMessage = 'Authentication failed';
       if (error.message.contains('EMAIL_EXISTS')) {
         errorMessage = 'This email address is already in use.';
       } else if (error.message.contains('INVALID_EMAIL')) {
-        errorMessage = 'This is nota a valid email address.';
+        errorMessage = 'This is not a valid email address.';
       } else if (error.message.contains('WEAK_PASSWORD')) {
         errorMessage = 'This password is too weak.';
       } else if (error.message.contains('EMAIL_NOT_FOUND')) {

@@ -1,5 +1,7 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart' as DotEnv;
 
+import './models/models.dart';
+
 class Firebase {
   const Firebase._();
 
@@ -26,25 +28,25 @@ class Firebase {
     return apiKey;
   }
 
-  static Uri products(String authToken, {String? id, String? userID}) {
+  static Uri products(AuthCredential credential, {String? id, bool filterByUser = false}) {
     if (id != null) {
-      return _uri('/products/$id.json?auth=$authToken');
+      return _uri('/products/$id.json?auth=${credential.token}');
     }
-    if (userID != null) {
-      return _uri('/products.json?auth=$authToken&orderBy="creatorID"&equalTo="$userID"');
+    if (filterByUser) {
+      return _uri('/products.json?auth=${credential.token}&orderBy="creatorID"&equalTo="${credential.userID}"');
     }
-    return _uri('/products.json?auth=$authToken');
+    return _uri('/products.json?auth=${credential.token}');
   }
 
-  static Uri userFavorites(String authToken, String userID, [String? productID]) {
+  static Uri userFavorites(AuthCredential credential, {String? productID}) {
     if (productID != null) {
-      return _uri('/userFavorites/$userID/$productID.json?auth=$authToken');
+      return _uri('/userFavorites/${credential.userID}/$productID.json?auth=${credential.token}');
     }
-    return _uri('/userFavorites/$userID.json?auth=$authToken');
+    return _uri('/userFavorites/${credential.userID}.json?auth=${credential.token}');
   }
 
-  static Uri orders(String authToken, String userID) {
-    return _uri('/orders/$userID.json?auth=$authToken');
+  static Uri orders(AuthCredential credential) {
+    return _uri('/orders/${credential.userID}.json?auth=${credential.token}');
   }
 
   static Uri _uri(String path) => Uri.parse('$domain$path');
